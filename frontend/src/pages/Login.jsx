@@ -1,0 +1,47 @@
+import { useState } from 'react' 
+import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
+
+function Login() {
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const navigate = useNavigate()
+
+  const login = () => {
+    if (!username || !password) {
+      setError('All fields are required')
+      return
+    }
+
+    setError('')
+    axios.post('http://localhost:5000/login', { username, password })
+      .then((res) => {
+        // 🔐 store username
+        localStorage.setItem('username', res.data.username || username)
+        navigate('/dashboard')
+      })
+      .catch(() => setError('Invalid credentials'))
+  }
+
+  return (
+    <div className="container auth-card dark">
+      <h2>Welcome Back</h2>
+
+      {error && <p className="error">{error}</p>}
+
+      <input placeholder="Username" value={username} onChange={e => setUsername(e.target.value)}/>
+
+      <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)}/>
+
+      <button onClick={login}>Login</button>
+
+      {/* 🔹 Create Account / Register link */}
+      <p className="switch-text" onClick={() => navigate('/register')}>
+        New user? <span>Create Account</span>
+      </p>
+    </div>
+  )
+}
+
+export default Login

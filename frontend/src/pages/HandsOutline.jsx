@@ -5,21 +5,21 @@ import "./style.css";
 
 // LEFT hand finger positions (Thumb → Little)
 const leftHandPositions = [
-  { top: 205, left: 310 },
-  { top: 205, left: 310 }, // Thumb
-  { top: 95,  left: 250 }, // Index
-  { top: 65,  left: 190 }, // Middle
-  { top: 85,  left: 133 }, // Ring
-  { top: 140, left: 92  }  // Little
+  { top: 210, left: 310 },
+  { top: 210, left: 310 }, // Thumb
+  { top: 95,  left: 245 }, // Index
+  { top: 65,  left: 182 }, // Middle
+  { top: 85,  left: 123 }, // Ring
+  { top: 144, left: 80  }  // Little
 ];
 
 // RIGHT hand finger positions (Thumb → Little)
 const rightHandPositions = [
-  { top: 203, left: 74  }, // Thumb
-  { top: 87,  left: 137 }, // Index
-  { top: 65,  left: 197 }, // Middle
-  { top: 88,  left: 255 }, // Ring
-  { top: 139, left: 297 }  // Little
+  { top: 212, left: 79  }, // Thumb
+  { top: 90,  left: 142 }, // Index
+  { top: 65,  left: 205 }, // Middle
+  { top: 88,  left: 263 }, // Ring
+  { top: 145, left: 307 }  // Little
 ];
 
 const HandsOutline = ({ captureTrigger }) => {
@@ -56,8 +56,8 @@ const HandsOutline = ({ captureTrigger }) => {
     }
   }, [captureTrigger]);
 
-  return (
-    <div className="hands-wrapper">
+  return (  
+       <div className="hands-wrapper">
       {/* LEFT HAND */}
       <div className="hand-container">
         <img src={leftHand} className="hand-img" alt="Left Hand" />
@@ -108,6 +108,7 @@ const HandsOutline = ({ captureTrigger }) => {
         )}
       </div>
     </div>
+   
   );
 };
 

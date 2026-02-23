@@ -1,0 +1,105 @@
+.handscan {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 30px;
+  gap: 20px;
+}
+
+/* SIDE PANELS */
+.panel {
+  width: 25%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-left: 50px;
+}
+
+/* BUTTON ROW */
+.button-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.button-row button {
+  flex: 1;
+  margin: 0 4px;
+  padding: 10px 0;
+  font-size: 15px;
+  cursor: pointer;
+  background: white;
+  color: #555;
+  border: 2px solid black;
+}
+
+.button-row button:hover {
+  background: #f0f0f0;
+}
+/* BLANK BOX */
+.blank-box {
+  height: 270px;
+  border: 2px solid black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #555;
+  background-color: #fff;
+}
+
+/* HANDS CENTER */
+.hands {
+  width: 40%;
+  display: flex;
+  justify-content: center;
+  margin-right: 400px;
+}
+.capture-btn {
+  padding: 10px;
+  font-size: 15px;
+  cursor: pointer;
+  border: 2px solid black;
+  background-color: white;
+  margin-top: 10px;
+  color: #555;
+}
+.capture-btn:hover {
+  background-color: #f0f0f0;
+}
+.hands-wrapper {
+  display: flex;
+  justify-content: center;
+  /* gap: 30px; */
+  margin-left: 550px;
+}
+
+.hand-img {
+  width: 400px;
+  height: auto;
+  border: 3px solid black;
+  padding: 10px;
+}
+.dot {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: lime;
+  box-shadow: 0 0 8px lime;
+  border-radius: 50%;
+   /* transition: all 0.3s ease; */
+}
+.hand-container {
+  position: relative;
+}
+
+/* .left-dot-1 { top: 140px; left: 89px; } */
+
+/* .left-dot-1 { top: 80px; left: 129px; } */
+
+/* .left-dot-1 { top: 60px; left: 185px; } */
+
+/* .left-dot-1 { top: 60px; left: 186px; } */
+
+/* .left-dot-1 { top: 90px; left: 247px; } */
+
+/* .left-dot-1 { top: 200px; left: 310px; } */
