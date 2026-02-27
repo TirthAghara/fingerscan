@@ -14,17 +14,30 @@ function Login() {
       return
     }
 
+    
+    
     setError('')
     axios.post('http://localhost:5000/login', { username, password })
-      .then((res) => {
-        // 🔐 store username
-        localStorage.setItem('username', res.data.username || username)
-        navigate('/dashboard')
-      })
+    .then((res) => {
+    console.log("LOGIN RESPONSE:", res.data);
+
+    // If backend returns full user object
+    const userData = res.data.user || res.data;
+
+    if (!userData || !userData._id) {
+      setError("Invalid server response");
+      return;
+    }
+
+    localStorage.setItem("user", JSON.stringify(userData));
+
+    navigate('/dashboard');
+   })
       .catch(() => setError('Invalid credentials'))
   }
 
   return (
+    
     <div className="container auth-card dark">
       <h2>Welcome Back</h2>
 

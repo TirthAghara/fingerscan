@@ -28,34 +28,69 @@ const HandsOutline = ({ captureTrigger }) => {
 
   const [scannedLeft, setScannedLeft] = useState([]);
   const [scannedRight, setScannedRight] = useState([]);
+  const [sideCount, setSideCount] = useState(0); 
+
+  // useEffect(() => {
+  //   if (hand === "left") {
+  //     // Save current left finger
+  //     setScannedLeft(prev => [...prev, leftHandPositions[fingerIndex]]);
+
+  //     if (fingerIndex < leftHandPositions.length - 1) {
+  //       setFingerIndex(fingerIndex + 1);
+  //     } else {
+  //       setHand("right");
+  //       setFingerIndex(0);
+  //     }
+  //   } else {
+  //     // Save current right finger
+  //     setScannedRight(prev => [...prev, rightHandPositions[fingerIndex]]);
+
+  //     if (fingerIndex < rightHandPositions.length - 1) {
+  //       setFingerIndex(fingerIndex + 1);
+  //     } else {
+  //       // Reset cycle
+  //       setHand("left");
+  //       setFingerIndex(0);
+  //       setScannedLeft([]);
+  //       setScannedRight([]);
+  //     }
+  //   }
+  // }, [captureTrigger]);
+
 
   useEffect(() => {
-    if (hand === "left") {
-      // Save current left finger
-      setScannedLeft(prev => [...prev, leftHandPositions[fingerIndex]]);
+  if (!captureTrigger) return;
 
-      if (fingerIndex < leftHandPositions.length - 1) {
-        setFingerIndex(fingerIndex + 1);
-      } else {
-        setHand("right");
-        setFingerIndex(0);
-      }
+  // Increase side count first
+  if (sideCount < 2) {
+    setSideCount(prev => prev + 1);
+    return; // Stop here until 3 sides done
+  }
+
+  // After 3 sides → reset sideCount
+  setSideCount(0);
+
+  if (hand === "left") {
+    setScannedLeft(prev => [...prev, leftHandPositions[fingerIndex]]);
+
+    if (fingerIndex < leftHandPositions.length - 1) {
+      setFingerIndex(prev => prev + 1);
     } else {
-      // Save current right finger
-      setScannedRight(prev => [...prev, rightHandPositions[fingerIndex]]);
-
-      if (fingerIndex < rightHandPositions.length - 1) {
-        setFingerIndex(fingerIndex + 1);
-      } else {
-        // Reset cycle
-        setHand("left");
-        setFingerIndex(0);
-        setScannedLeft([]);
-        setScannedRight([]);
-      }
+      setHand("right");
+      setFingerIndex(0);
     }
-  }, [captureTrigger]);
 
+  } else {
+    setScannedRight(prev => [...prev, rightHandPositions[fingerIndex]]);
+
+    if (fingerIndex < rightHandPositions.length - 1) {
+      setFingerIndex(prev => prev + 1);
+    } else {
+      alert("All 10 Fingers Completed ✅");
+    }
+  }
+
+}, [captureTrigger]);
   return (  
        <div className="hands-wrapper">
       {/* LEFT HAND */}

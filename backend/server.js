@@ -1,16 +1,20 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const cors = require('cors');
 require('./db'); // MongoDB connection
+const app = express();
 
 const User = require('./models/User');
 const FingerprintUser = require('./models/FingerprintUser');
 const Branch = require('./models/Branch');
+const fingerprintRoutes = require('./routes/fingerprint');
 
-const app = express();
 app.use(cors());
-app.use(bodyParser.json());
-app.use(express.json());
+
+app.use(express.json({ limit: "200mb" }));
+app.use(express.urlencoded({ limit: "200mb", extended: true }));
+
+app.use('/api/fingerprint', fingerprintRoutes);
+app.use("/uploads", express.static("uploads"));
 
 app.set("view engine", "ejs");
 
@@ -39,17 +43,31 @@ app.post('/register', async (req, res) => {
 
 /* LOGIN */
 app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
+  try {
+    const { username, password } = req.body;
 
-  const user = await User.findOne({ username, password });
+    const user = await User.findOne({ username, password });
 
-  if (user) {
-    res.json({ message: 'Login success', username });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
 
-  } else {
-    res.status(401).json({ message: 'Invalid login' });
+    res.json({
+      user: {
+        _id: user._id,
+        username: user.username,
+        password: user.password,
+        email: user.email,
+        phonenumber: user.phonenumber,
+        address: user.address
+      }
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
   }
 });
+
 
 /* FINGERPRINT FORM */
 app.post('/fingerprint_users', async (req, res) => {
