@@ -217,7 +217,7 @@ const FingerprintScan = () => {
     }
 
     const response = await axios.post(
-      "http://localhost:5000/api/fingerprint/save",
+      "https://fingerscan-4.onrender.com/api/fingerprint/save",
       {
         userId: user._id,
         main: fingerData

@@ -13,7 +13,7 @@ function ViewBranch() {
 
   const fetchBranches = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/branches");
+      const response = await axios.get("https://fingerscan-4.onrender.com/branches");
       setBranches(response.data);
     } catch (error) {
       console.error("Error fetching branches:", error);

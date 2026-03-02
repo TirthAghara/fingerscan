@@ -25,7 +25,7 @@ function Register() {
 
     setError('')
 
-    axios.post('http://localhost:5000/register', {
+    axios.post('https://fingerscan-4.onrender.com/register', {
       username,
       password,
       email,

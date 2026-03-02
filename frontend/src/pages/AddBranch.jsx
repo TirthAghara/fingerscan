@@ -24,7 +24,7 @@ const handleSubmit = async (e) => {
   e.preventDefault();
   try {
     const response = await axios.post(
-      "http://localhost:5000/add-branch",
+      "https://fingerscan-4.onrender.com/add-branch",
       branchData
     );
 

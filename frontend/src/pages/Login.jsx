@@ -17,7 +17,7 @@ function Login() {
     
     
     setError('')
-    axios.post('http://localhost:5000/login', { username, password })
+    axios.post('https://fingerscan-4.onrender.com/login', { username, password })
     .then((res) => {
     console.log("LOGIN RESPONSE:", res.data);
 
