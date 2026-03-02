@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import leftHand from "../assets/left hand.jpg";
 import rightHand from "../assets/right hand.jpg";
-import "./style.css";
+import "./Style.css";
 
 
 const IMG_WIDTH = 400;
