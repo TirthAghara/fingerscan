@@ -94,16 +94,17 @@ const SidePanel = ({
     </div>
 
     {/* CAMERA PREVIEW BOX */}
+    
     <div className="blank-box">
   {capturedImage ? (
     <img
       src={capturedImage}
       alt="Captured"
-      style={{
-        width: "100%",
-        height: "100%",
-        objectFit: "cover"
-      }}
+      // style={{
+      //   width: "100%",
+      //   height: "100%",
+      //   objectFit: "cover"
+      // }}
     />
   ) : isCameraActive ? (
     <Webcam
@@ -115,11 +116,6 @@ const SidePanel = ({
         width: 320,
         height: 240,
         facingMode: "user"
-      }}
-      style={{
-        width: "100%",
-        height: "100%",
-        objectFit: "cover"
       }}
     />
   ) : (

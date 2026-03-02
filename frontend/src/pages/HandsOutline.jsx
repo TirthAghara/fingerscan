@@ -3,23 +3,25 @@ import leftHand from "../assets/left hand.jpg";
 import rightHand from "../assets/right hand.jpg";
 import "./style.css";
 
+
+const IMG_WIDTH = 400;
+const IMG_HEIGHT = 500;
 // LEFT hand finger positions (Thumb → Little)
 const leftHandPositions = [
-  { top: 210, left: 310 },
-  { top: 210, left: 310 }, // Thumb
-  { top: 95,  left: 245 }, // Index
-  { top: 65,  left: 182 }, // Middle
-  { top: 85,  left: 123 }, // Ring
-  { top: 144, left: 80  }  // Little
+  { top: `${(265 / IMG_HEIGHT) * 100}%`, left: `${(310 / IMG_WIDTH) * 100}%` }, // Thumb
+  { top: `${(95 / IMG_HEIGHT) * 100}%`,  left: `${(245 / IMG_WIDTH) * 100}%` }, // Index
+  { top: `${(65 / IMG_HEIGHT) * 100}%`,  left: `${(182 / IMG_WIDTH) * 100}%` }, // Middle
+  { top: `${(85 / IMG_HEIGHT) * 100}%`,  left: `${(123 / IMG_WIDTH) * 100}%` }, // Ring
+  { top: `${(144 / IMG_HEIGHT) * 100}%`, left: `${(80 / IMG_WIDTH) * 100}%` }   // Little
 ];
 
 // RIGHT hand finger positions (Thumb → Little)
 const rightHandPositions = [
-  { top: 212, left: 79  }, // Thumb
-  { top: 90,  left: 142 }, // Index
-  { top: 65,  left: 205 }, // Middle
-  { top: 88,  left: 263 }, // Ring
-  { top: 145, left: 307 }  // Little
+  { top: `${(212 / IMG_HEIGHT) * 100}%`, left: `${(79 / IMG_WIDTH) * 100}%` },
+  { top: `${(90 / IMG_HEIGHT) * 100}%`,  left: `${(142 / IMG_WIDTH) * 100}%` },
+  { top: `${(65 / IMG_HEIGHT) * 100}%`,  left: `${(205 / IMG_WIDTH) * 100}%` },
+  { top: `${(88 / IMG_HEIGHT) * 100}%`,  left: `${(263 / IMG_WIDTH) * 100}%` },
+  { top: `${(145 / IMG_HEIGHT) * 100}%`, left: `${(307 / IMG_WIDTH) * 100}%` }
 ];
 
 const HandsOutline = ({ captureTrigger }) => {
