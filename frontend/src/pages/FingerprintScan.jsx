@@ -53,7 +53,7 @@
 import { useState, useRef } from "react";
 import Webcam from "react-webcam";
 import HandsOutline from "./HandsOutline";
-import "./style.css";
+import "./Style.css";
 import Sidebar from "../component/sidebar";
 import axios from "axios";
 
