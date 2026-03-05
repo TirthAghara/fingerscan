@@ -119,7 +119,7 @@ app.get("/branches", async (req, res) => {
   }
 });
 
-onnectDB().then(() => {
+connectDB().then(() => {
     app.listen(PORT, () => {
         console.log(`🚀 Server running on port ${PORT}`);
         console.log("📂 Database status: Connected and Ready");
