@@ -119,6 +119,12 @@ app.get("/branches", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+onnectDB().then(() => {
+    app.listen(PORT, () => {
+        console.log(`🚀 Server running on port ${PORT}`);
+        console.log("📂 Database status: Connected and Ready");
+    });
+}).catch((err) => {
+    console.error("❌ Critical: Server could not start because DB connection failed.");
+    console.error("Error Details:", err.message);
 });
