@@ -37,7 +37,7 @@ function FingerprintForm() {
         }
 
         try {
-            await axios.post('http://localhost:5000/fingerprint_users', data)
+            await axios.post('https://fingerscan-4.onrender.com/fingerprint_users', data)
             navigate('/scan')  
         } catch (err) {
             alert('Failed to save user data')

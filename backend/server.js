@@ -1,16 +1,31 @@
+require('dotenv').config();
 const PORT = process.env.PORT || 5000;
 const express = require('express');
 const cors = require('cors');
-require('./db'); // MongoDB connection
+const connectDB = require('./db');
+
 const app = express();
+connectDB(); // MongoDB connection
 
 const User = require('./models/User');
 const FingerprintUser = require('./models/FingerprintUser');
 const Branch = require('./models/Branch');
 const fingerprintRoutes = require('./routes/fingerprint');
 
+
+const allowedOrigins = [
+  "https://fingerscan-frontend.onrender.com", // Live URL
+  "http://localhost:3000"                     // Local Development
+];
+
 app.use(cors({
-  origin: "https://fingerscan-frontend.onrender.com"
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
 }));
 
 app.use(express.json({ limit: "200mb" }));
@@ -67,8 +82,9 @@ app.post('/login', async (req, res) => {
     });
 
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
+  console.error("Login Error:", error); // Ye Render Logs me dikhega
+  res.status(500).json({ message: error.message }); // Ye frontend par dikhega
+}
 });
 
 
