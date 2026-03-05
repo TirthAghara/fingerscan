@@ -9,6 +9,7 @@
 const mongoose = require("mongoose");
 
 const connectDB = async () => {
+  console.log("Checking URI:", process.env.MONGO_URI ? "Found" : "NOT FOUND"); // Ye line add karein
   try {
     if (!process.env.MONGO_URI) {
       throw new Error("MONGO_URI is not defined");
