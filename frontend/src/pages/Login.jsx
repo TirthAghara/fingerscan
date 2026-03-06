@@ -31,7 +31,7 @@ function Login() {
 
     localStorage.setItem("user", JSON.stringify(userData));
 
-    navigate('https://fingerscan-4.onrender.com/fingerprint_users');
+    navigate('/dashboard');
    })
       .catch(() => setError('Invalid credentials'))
   }
