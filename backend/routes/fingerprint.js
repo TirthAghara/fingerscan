@@ -38,6 +38,49 @@ router.post('/save', async (req, res) => {
     const writeStream = fs.createWriteStream(pdfPath);
     doc.pipe(writeStream);
 
+    // ==============================
+// 5️⃣ LOOP THROUGH HANDS & FINGERS
+// ==============================
+Object.keys(main).forEach((hand) => {
+  main[hand].fingers.forEach((finger) => {
+    
+    // Naya Page har finger ke liye
+    doc.addPage(); 
+
+    doc.fontSize(20).text(`Hand: ${hand.toUpperCase()}`, { align: "center" });
+    doc.fontSize(16).text(`Finger: ${finger.name}`, { align: "center" }).moveDown(1);
+
+    // Sides check karein (left, center, right)
+    ["left", "center", "right"].forEach((side) => {
+      const imageData = finger.sides[side];
+
+      if (imageData && imageData.startsWith("data:image")) {
+        try {
+          // Base64 ko buffer mein convert karein
+          const base64Data = imageData.split(",")[1];
+          const imgBuffer = Buffer.from(base64Data, "base64");
+
+          doc.fontSize(12).text(side.toUpperCase(), { align: "center" });
+
+          // ✅ FIX: Image width ko 400-500 ke beech rakhein taaki page par fit ho
+          doc.image(imgBuffer, {
+            fit: [500, 200], // Isse image auto-resize ho jayegi
+            align: "center"
+          });
+
+          doc.moveDown(13); // Agli image ke liye thodi jagah chhodein
+        } catch (imgError) {
+          console.error(`Error adding image for ${side}:`, imgError);
+        }
+      } else {
+        doc.text(`(No image captured for ${side})`, { align: "center" });
+      }
+    });
+  });
+});
+
+doc.end();
+
     doc.fontSize(22).text("Fingerprint Report", { align: "center" }).moveDown();
     doc.fontSize(14).text(`Name: ${user.username}`).text(`Email: ${user.email}`).moveDown();
 
