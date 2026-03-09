@@ -9,96 +9,82 @@ const User = require("../models/User");
 router.post('/save', async (req, res) => {
   try {
     const { userId, main } = req.body;
-    
-    // 🔍 LOG 1: Check karein ki data aaya ya nahi
-    console.log("--- New Save Request ---");
-    console.log("User ID:", userId);
-    console.log("Hands in data:", main ? Object.keys(main) : "NULL");
 
-    if (!main) return res.status(400).send("No data received");
+    if (!userId || !main) {
+      return res.status(400).json({ success: false, message: "Missing data" });
+    }
 
     const user = await User.findById(userId);
-    const pdfPath = path.join(__dirname, "../", `${user.username}_report.pdf`);
-    const doc = new PDFDocument({ margin: 30 });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // 1️⃣ PDF Document yahan define karein
+    const doc = new PDFDocument({ margin: 30, size: 'A4' }); 
+    
+    // 2️⃣ File path setup
+    const pdfPath = path.join(__dirname, "../../", `${user.username}_report.pdf`);
     const writeStream = fs.createWriteStream(pdfPath);
     doc.pipe(writeStream);
 
-    doc.fontSize(25).text("FINGERPRINT REPORT", { align: "center" }).moveDown();
+    // 3️⃣ Ab aap doc use kar sakte hain (Line 71 fix)
+    doc
+      .fontSize(22)
+      .text("Fingerprint Report", { align: "center" })
+      .moveDown();
 
-    // Loop through Hands (Left/Right)
-    for (const hand of Object.keys(main)) {
-      for (const finger of main[hand].fingers) {
+    doc
+      .fontSize(14)
+      .text(`Name: ${user.username}`)
+      .text(`Email: ${user.email}`)
+      .moveDown(2);
+
+    // ==============================
+    // 4️⃣ IMAGES LOOP (Jo humne discuss kiya tha)
+    // ==============================
+    Object.keys(main).forEach((hand) => {
+      main[hand].fingers.forEach((finger) => {
         doc.addPage();
         doc.fontSize(20).text(`${hand.toUpperCase()} - ${finger.name}`, { align: "center" }).moveDown();
 
-        for (const side of ["left", "center", "right"]) {
+        ["left", "center", "right"].forEach((side) => {
           const imageData = finger.sides[side];
-
           if (imageData && imageData.includes("data:image")) {
-            console.log(`✅ Image found for ${finger.name} (${side})`); // 🔍 LOG 2
-            
             const base64Data = imageData.split(",")[1];
             const imgBuffer = Buffer.from(base64Data, "base64");
 
             doc.fontSize(12).text(side.toUpperCase(), { align: "center" });
-            
-            // Image placement
             doc.image(imgBuffer, {
-              fit: [450, 200], // Page width se chota rakha hai
+              fit: [500, 200],
               align: 'center'
             });
             doc.moveDown(12);
-          } else {
-            console.log(`❌ No image for ${finger.name} (${side})`); // 🔍 LOG 3
-            doc.text(`[No ${side} image captured]`, { align: "center" }).moveDown();
           }
-        }
-      }
-    }
-
-    doc.end();
-
-    writeStream.on('finish', () => {
-      res.download(pdfPath);
-    });
-
-  } catch (error) {
-    console.error("PDF Error:", error);
-    res.status(500).send(error.message);
-  }
-});
-
-    doc.fontSize(22).text("Fingerprint Report", { align: "center" }).moveDown();
-    doc.fontSize(14).text(`Name: ${user.username}`).text(`Email: ${user.email}`).moveDown();
-
-    // Finger data loop... (Aapka purana loop yahan rahega)
-    Object.keys(main).forEach((hand) => {
-      main[hand].fingers.forEach((finger) => {
-        doc.addPage().fontSize(16).text(`Hand: ${hand.toUpperCase()} - ${finger.name}`, { align: "center" });
-        // Images logic...
+        });
       });
     });
 
+    // 5️⃣ PDF Khatam karein
     doc.end();
 
-    // ✅ FIX 2: PDF likhne ka intezar karein, fir stream karein
+    // 6️⃣ Stream hone ka wait karein aur fir download bhejein
     writeStream.on('finish', () => {
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `attachment; filename=${user.username}_report.pdf`);
-      
-      const readStream = fs.createReadStream(pdfPath);
-      readStream.pipe(res);
+      fs.createReadStream(pdfPath).pipe(res);
     });
 
+  } catch (error) {
+    console.error("FULL ERROR:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
 
-// ✅ FIX 3: Path ko sirf '/:userId' rakhein
+// GET ROUTE
 router.get('/:userId', async (req, res) => {
   try {
     const fingerprint = await Fingerprint.findOne({ userId: req.params.userId });
-    if (!fingerprint) return res.status(404).json({ message: "Not found" });
     res.status(200).json({ success: true, data: fingerprint });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 
