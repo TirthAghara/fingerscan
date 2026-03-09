@@ -174,33 +174,8 @@ const FingerprintScan = () => {
   right: { fingers: [] }
 });
 
-// const handleCapture = () => {
-
-
-//   if (capturedImage) {
-//     setCapturedImage(null);
-//     setIsCameraActive(true);
-//     return;
-//   }
-
-
-//   if (!isCameraActive) {
-//     setIsCameraActive(true);
-//     return;
-//   }
-
-
-//   if (webcamRef.current) {
-//     const imageSrc = webcamRef.current.getScreenshot();
-//     if (imageSrc) {
-//       setCapturedImage(imageSrc);
-//       setCaptureCount((prev) => prev + 1);
-//       setIsCameraActive(false); // Turn OFF camera
-//     }
-//   }
-// };
-
-  const saveToDatabase = async () => {
+ // Function ko 'freshData' accept karne ke liye badlein
+const saveToDatabase = async (freshData) => { 
   try {
     const storedUser = localStorage.getItem("user");
     if (!storedUser || storedUser === "undefined") {
@@ -210,18 +185,18 @@ const FingerprintScan = () => {
 
     const user = JSON.parse(storedUser);
 
-    // 1️⃣ URL ko '/save' par change karein (404 fix karne ke liye)
-    // 2️⃣ responseType: 'blob' add karein (PDF download ke liye)
+    // Debug: Check karein ki images hain ya nahi
+    console.log("Sending data to server:", freshData);
+
     const response = await axios.post(
       'https://fingerscan-4.onrender.com/api/fingerprint/save', 
       {
         userId: user._id,
-        main: fingerData
+        main: freshData // 👈 State ki jagah freshData bhejien
       },
       { responseType: 'blob' } 
     );
 
-    // 3️⃣ Browser mein PDF Download trigger karein
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;
@@ -234,12 +209,11 @@ const FingerprintScan = () => {
 
   } catch (error) {
     console.error("Error saving:", error);
-    alert("Error saving data. Check console for details.");
+    alert("Error saving data.");
   }
 };
 
   const handleCapture = () => {
-
   if (capturedImage) {
     setCapturedImage(null);
     setIsCameraActive(true);
@@ -254,61 +228,50 @@ const FingerprintScan = () => {
   if (webcamRef.current) {
     const imageSrc = webcamRef.current.getScreenshot();
 
-
-
     if (imageSrc) {
-  setCapturedImage(imageSrc);
-  setCaptureCount((prev) => prev + 1);
-  setIsCameraActive(false);
+      setCapturedImage(imageSrc);
+      setCaptureCount((prev) => prev + 1);
+      setIsCameraActive(false);
 
-  const currentSide = sides[currentSideIndex].toLowerCase();
+      const currentSide = sides[currentSideIndex].toLowerCase();
+      const handType = currentFingerIndex < 5 ? "left" : "right";
+      const fingerIndex = currentFingerIndex % 5;
+      const fingerName = fingerNames[fingerIndex];
 
-  const handType = currentFingerIndex < 5 ? "left" : "right";
-  const fingerIndex = currentFingerIndex % 5;
-  const fingerName = fingerNames[fingerIndex];
+      // 1. Naya data object banayein purane data se
+      const updatedFingerData = { ...fingerData };
+      let fingerArray = [...updatedFingerData[handType].fingers];
 
-  setFingerData((prev) => {
-    const updated = { ...prev };
+      let fingerObj = fingerArray.find(f => f.name === fingerName);
 
-    let fingerArray = [...updated[handType].fingers];
+      if (!fingerObj) {
+        fingerObj = { name: fingerName, sides: {} };
+        fingerArray.push(fingerObj);
+      }
 
-    // Check if finger already exists
-    let fingerObj = fingerArray.find(f => f.name === fingerName);
+      fingerObj.sides[currentSide] = imageSrc;
+      updatedFingerData[handType].fingers = fingerArray;
 
-    if (!fingerObj) {
-      fingerObj = {
-        name: fingerName,
-        sides: {}
-      };
-      fingerArray.push(fingerObj);
+      // 2. State update karein (Next time ke liye)
+      setFingerData(updatedFingerData);
+
+      // 3. Logic for Next Step
+      if (currentSideIndex < sides.length - 1) {
+        setCurrentSideIndex((prev) => prev + 1);
+      } else {
+        setCompletedSides([]);
+        setCurrentSideIndex(0);
+
+        if (currentFingerIndex < 9) {
+          setCurrentFingerIndex((prev) => prev + 1);
+        } else {
+          // 🚀 AAKHRI STEP: Updated data ko directly bhejien
+          saveToDatabase(updatedFingerData); 
+        }
+      }
     }
-
-    fingerObj.sides[currentSide] = imageSrc;
-
-    updated[handType].fingers = fingerArray;
-
-    return updated;
-  });
-
-  // Move to next side
-  if (currentSideIndex < sides.length - 1) {
-    setCurrentSideIndex((prev) => prev + 1);
-  } else {
-    setCompletedSides([]);
-    setCurrentSideIndex(0);
-
-    if (currentFingerIndex < 9) {
-      setCurrentFingerIndex((prev) => prev + 1);
-    } else {
-      saveToDatabase();   // 👈 CALL SAVE FUNCTION
-    }
-  }
-}
   }
 };
-
-
-
 
   return (
     <div className="container handscan">
