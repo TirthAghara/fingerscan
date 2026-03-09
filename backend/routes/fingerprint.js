@@ -90,11 +90,6 @@ router.post('/save', async (req, res) => {
       readStream.pipe(res);
     });
 
-  } catch (error) {
-    console.error("ERROR:", error);
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
 
 // ✅ FIX 3: Path ko sirf '/:userId' rakhein
 router.get('/:userId', async (req, res) => {
