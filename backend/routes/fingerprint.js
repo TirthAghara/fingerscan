@@ -11,7 +11,7 @@ const User = require("../models/User");
 // @access  Public (should be protected in production)
 
 
-router.post('/save', async (req, res) => {
+router.post('/api/fingerprint/save', async (req, res) => {
   try {
     const { userId, main } = req.body;
 
@@ -175,6 +175,12 @@ doc.pipe(fs.createWriteStream(pdfPath));
 
     doc.end();
 
+    // PDF file puri tarah banne ka intezar karein, fir download bhejein
+    const stream = fs.createReadStream(pdfPath);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=${user.username}_report.pdf`);
+    stream.pipe(res);
+
     // ==============================
     // 6️⃣ RESPONSE
     // ==============================
@@ -196,7 +202,7 @@ doc.pipe(fs.createWriteStream(pdfPath));
 });
 
 
-router.get('/:userId', async (req, res) => {
+router.get('/api/fingerprint/:userId', async (req, res) => {
   try {
     const fingerprint = await Fingerprint.findOne({ userId: req.params.userId });
 
