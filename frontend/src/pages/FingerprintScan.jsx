@@ -203,7 +203,6 @@ const FingerprintScan = () => {
   const saveToDatabase = async () => {
   try {
     const storedUser = localStorage.getItem("user");
-
     if (!storedUser || storedUser === "undefined") {
       alert("Please login first ❌");
       return;
@@ -211,26 +210,33 @@ const FingerprintScan = () => {
 
     const user = JSON.parse(storedUser);
 
-    if (!user._id) {
-      alert("Invalid user data ❌");
-      return;
-    }
-
+    // 1️⃣ URL ko '/save' par change karein (404 fix karne ke liye)
+    // 2️⃣ responseType: 'blob' add karein (PDF download ke liye)
     const response = await axios.post(
-      `https://fingerscan-4.onrender.com/api/fingerprint/${user._id}`,
+      'https://fingerscan-4.onrender.com/api/fingerprint/save', 
       {
         userId: user._id,
         main: fingerData
-      }
+      },
+      { responseType: 'blob' } 
     );
 
-    alert("Saved Successfully ✅");
+    // 3️⃣ Browser mein PDF Download trigger karein
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `${user.username}_Fingerprint_Report.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    alert("Saved & PDF Downloaded Successfully ✅");
 
   } catch (error) {
     console.error("Error saving:", error);
+    alert("Error saving data. Check console for details.");
   }
 };
-
 
   const handleCapture = () => {
 
