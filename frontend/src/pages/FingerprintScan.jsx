@@ -316,22 +316,12 @@ const FingerprintScan = () => {
       <div className="camera">
       {isCameraActive && (
         <Webcam
-          ref={webcamRef}
-          audio={false}
-          screenshotFormat="image/png"
-          screenshotQuality={0.3}
-          videoConstraints={{
-            width: 320,
-            height: 240
-          }}
-          style={{
-            position: "absolute",
-            width: "1px",
-            height: "1px",
-            opacity: 0,
-            pointerEvents: "none"
-          }}
-        />
+        ref={webcamRef}
+        audio={false}
+        screenshotFormat="image/jpeg" // PNG ki jagah JPEG use karein, wo size mein choti hoti hai
+        screenshotQuality={0.8} 
+        videoConstraints={{ width: 640, height: 480 }}
+      />
       )}
     </div>
 
