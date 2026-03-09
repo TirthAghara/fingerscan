@@ -8,16 +8,16 @@ function FingerprintForm() {
     const [data, setData] = useState({
         name: '',
         father_name: '',
-        surname: '',
+        surname: '', // Input commented hai, isliye ye khali rahega
         mother_name: '',
         school_name: '',
-        medium_of_study: '',
+        medium: '',      // Match with select name="medium"
         gender: '',
         birthdate: '',
         occupation: '',
-        contact_no: '',
+        contact: '',     // Match with input name="contact"
         email: '',
-        home_address: '',
+        address: '',     // Match with textarea name="address"
         city: '',
         district: '',
         state: '',
@@ -31,13 +31,15 @@ function FingerprintForm() {
     const submitForm = async (e) => {
         e.preventDefault()
 
-        if (!data.name || !data.father_name || !data.surname || !data.contact) {
-            alert('Please fill all required fields')
+        // Validation: Sirf un fields ko check karein jo UI mein hain
+        if (!data.name || !data.father_name || !data.contact) {
+            alert('Please fill all required fields (Name, Father Name, and Contact) *')
             return
         }
 
         try {
-            await axios.post('https://fingerscan-4.onrender.com/fingerprint_users', data)
+            const response = await axios.post('https://fingerscan-4.onrender.com/fingerprint_users', data)
+            console.log("Form Saved:", response.data)
             navigate('/scan')  
         } catch (err) {
             alert('Failed to save user data')
@@ -47,16 +49,15 @@ function FingerprintForm() {
 
     return (
         <div className="fingerprint-page">
-            <div className="auth-card" >
+            <div className="auth-card">
                 <h2>Fingerprint Registration</h2>
 
                 <form onSubmit={submitForm}>
-                    {/* PERSONAL INFO */}
                     <h4 className="form-section">Personal Information</h4>
 
                     <div className="row mb-3">
+                        {/* Surname check hata diya hai kyunki input commented hai */}
                         <input name="name" placeholder="Your Full Name *" onChange={handleChange} />
-                        {/* <input name="surname" placeholder="Surname *" onChange={handleChange} /> */}
                     </div>
 
                     <div className="form-row">
@@ -76,20 +77,18 @@ function FingerprintForm() {
                         <label><input type="radio" name="gender" value="Other" onChange={handleChange} /> Other</label>
                     </div>
 
-                    {/* EDUCATION */}
                     <h4 className="form-section">Education</h4>
 
                     <div className="form-row">
                         <input name="school_name" placeholder="School Name" onChange={handleChange} />
                         <select name="medium" onChange={handleChange}>
                             <option value="">Medium</option>
-                            <option>English</option>
-                            <option>Hindi</option>
-                            <option>Gujarati</option>
+                            <option value="English">English</option>
+                            <option value="Hindi">Hindi</option>
+                            <option value="Gujarati">Gujarati</option>
                         </select>
                     </div>
 
-                    {/* CONTACT */}
                     <h4 className="form-section">Contact Details</h4>
 
                     <div className="form-row">
@@ -105,7 +104,6 @@ function FingerprintForm() {
                         <input name="state" placeholder="State" onChange={handleChange} />
                     </div>
 
-                    {/* REMARKS */}
                     <h4 className="form-section">Remarks</h4>
                     <textarea
                         name="remarks"
