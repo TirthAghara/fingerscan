@@ -276,7 +276,7 @@ const saveToDatabase = async (freshData) => {
   return (
     <div className="container handscan">
       {/* 1. MAIN CAMERA - MUST BE UNCOMMENTED FOR REF TO WORK */}
-      <div className="camera">
+      {/* <div className="camera">
       {isCameraActive && (
         <Webcam
         ref={webcamRef}
@@ -286,7 +286,7 @@ const saveToDatabase = async (freshData) => {
         videoConstraints={{ width: 640, height: 480 }}
       />
       )}
-    </div>
+    </div> */}
 
       {/* 2. HANDS OVERLAY */}
       <div className="hands">
