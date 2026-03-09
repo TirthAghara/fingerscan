@@ -6,85 +6,67 @@ const path = require("path");
 const PDFDocument = require("pdfkit");
 const User = require("../models/User");
 
-// ✅ FIX 1: Path ko sirf '/save' rakhein (Double prefix hatayein)
 router.post('/save', async (req, res) => {
   try {
     const { userId, main } = req.body;
+    
+    // 🔍 LOG 1: Check karein ki data aaya ya nahi
+    console.log("--- New Save Request ---");
+    console.log("User ID:", userId);
+    console.log("Hands in data:", main ? Object.keys(main) : "NULL");
 
-    if (!userId || !main) {
-      return res.status(400).json({ success: false, message: "Required fields missing" });
-    }
-
-    // 1️⃣ MongoDB Update
-    await Fingerprint.findOneAndUpdate(
-      { userId: userId },
-      { $set: { main: main } },
-      { new: true, upsert: true }
-    );
+    if (!main) return res.status(400).send("No data received");
 
     const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    // 2️⃣ Folder Setup
-    const uploadsDir = path.join(__dirname, "../uploads");
-    const userFolder = path.join(uploadsDir, user.username);
-    if (!fs.existsSync(userFolder)) fs.mkdirSync(userFolder, { recursive: true });
-
-    // 3️⃣ PDF Generation
-    const pdfPath = path.join(userFolder, `${user.username}_report.pdf`);
-    const doc = new PDFDocument();
-    
-    // WriteStream setup
+    const pdfPath = path.join(__dirname, "../", `${user.username}_report.pdf`);
+    const doc = new PDFDocument({ margin: 30 });
     const writeStream = fs.createWriteStream(pdfPath);
     doc.pipe(writeStream);
 
-    // ==============================
-// 5️⃣ LOOP THROUGH HANDS & FINGERS
-// ==============================
-Object.keys(main).forEach((hand) => {
-  main[hand].fingers.forEach((finger) => {
-    
-    // Har finger ke liye naya page
-    doc.addPage(); 
+    doc.fontSize(25).text("FINGERPRINT REPORT", { align: "center" }).moveDown();
 
-    doc.fontSize(22).fillColor("blue").text(`HAND: ${hand.toUpperCase()}`, { align: "center" });
-    doc.fontSize(18).fillColor("black").text(`Finger: ${finger.name}`, { align: "center" }).moveDown(1);
+    // Loop through Hands (Left/Right)
+    for (const hand of Object.keys(main)) {
+      for (const finger of main[hand].fingers) {
+        doc.addPage();
+        doc.fontSize(20).text(`${hand.toUpperCase()} - ${finger.name}`, { align: "center" }).moveDown();
 
-    // X aur Y coordinates control karne ke liye
-    let currentY = 120; 
+        for (const side of ["left", "center", "right"]) {
+          const imageData = finger.sides[side];
 
-    ["left", "center", "right"].forEach((side) => {
-      const imageData = finger.sides[side];
+          if (imageData && imageData.includes("data:image")) {
+            console.log(`✅ Image found for ${finger.name} (${side})`); // 🔍 LOG 2
+            
+            const base64Data = imageData.split(",")[1];
+            const imgBuffer = Buffer.from(base64Data, "base64");
 
-      // Debug: Check karein ki image data empty toh nahi hai
-      console.log(`Checking image for ${hand} ${finger.name} ${side}:`, imageData ? imageData.length : "EMPTY");
-
-      if (imageData && imageData.startsWith("data:image")) {
-        try {
-          const base64Data = imageData.split(",")[1];
-          const imgBuffer = Buffer.from(base64Data, "base64");
-
-          doc.fontSize(12).text(side.toUpperCase(), 50, currentY);
-          
-          // ✅ Image ko page ke beech mein fit karein
-          doc.image(imgBuffer, 50, currentY + 15, {
-            fit: [500, 180], // Max width 500, Max height 180
-            align: 'center'
-          });
-
-          currentY += 210; // Agli image ke liye gap
-        } catch (err) {
-          console.error("PDF Image Error:", err.message);
+            doc.fontSize(12).text(side.toUpperCase(), { align: "center" });
+            
+            // Image placement
+            doc.image(imgBuffer, {
+              fit: [450, 200], // Page width se chota rakha hai
+              align: 'center'
+            });
+            doc.moveDown(12);
+          } else {
+            console.log(`❌ No image for ${finger.name} (${side})`); // 🔍 LOG 3
+            doc.text(`[No ${side} image captured]`, { align: "center" }).moveDown();
+          }
         }
-      } else {
-        doc.fillColor("red").text(`[No image captured for ${side}]`, 50, currentY);
-        currentY += 40;
       }
-    });
-  });
-});
+    }
 
-doc.end();
+    doc.end();
+
+    writeStream.on('finish', () => {
+      res.download(pdfPath);
+    });
+
+  } catch (error) {
+    console.error("PDF Error:", error);
+    res.status(500).send(error.message);
+  }
+});
 
     doc.fontSize(22).text("Fingerprint Report", { align: "center" }).moveDown();
     doc.fontSize(14).text(`Name: ${user.username}`).text(`Email: ${user.email}`).moveDown();
